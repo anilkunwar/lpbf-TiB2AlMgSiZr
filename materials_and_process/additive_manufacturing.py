@@ -89,7 +89,7 @@ st.write("Explore LPBF of TiB2-modified Al-Mg-Si-Zr alloys.")
 # Mapping of display names to YAML files and images
 file_map = {
     "Process": {"yaml": os.path.join(SCRIPT_DIR, "lpbf_process.yaml"), "image":os.path.join(SCRIPT_DIR, "images", "lpbf-process.jpg")},
-    "Alloy Matrix": {"yaml": os.path.join(SCRIPT_DIR, "base_materials.yaml"), "image": os.path.join(SCRIPT_DIR, "alloy_matrix.jpg")},
+    "Alloy Matrix": {"yaml": os.path.join(SCRIPT_DIR, "base_materials.yaml"), "image": os.path.join(SCRIPT_DIR, "base-alloy.jpg")},
     "Composite Blend": {"yaml": os.path.join(SCRIPT_DIR, "composite_powder.yaml"), "image": os.path.join(SCRIPT_DIR, "composite-powder.jpg")}
 }
 
