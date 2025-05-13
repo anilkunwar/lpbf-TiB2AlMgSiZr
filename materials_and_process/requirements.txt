@@ -1,3 +1,4 @@
 pyyaml
 os
 re
+streamlit
