@@ -1,4 +1,2 @@
 pyyaml
-os
-re
 streamlit
