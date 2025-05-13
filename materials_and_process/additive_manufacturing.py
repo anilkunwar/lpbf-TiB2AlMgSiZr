@@ -2,11 +2,13 @@ import streamlit as st
 import yaml
 import re
 import os
+import base64
+from streamlit.components.v1 import html
 
 # Get the directory of the current script
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 
-# Minimal CSS for clean, pleasing appearance
+# Minimal CSS for clean appearance
 st.markdown("""
     <style>
     .main {
@@ -17,143 +19,144 @@ st.markdown("""
         border-radius: 5px;
         padding: 8px;
         font-size: 16px;
-        background-color: #ffffff;
     }
     .data-section {
         background-color: #f8f9fa;
         border: 1px solid #e0e0e0;
         border-radius: 5px;
-        padding: 15px;
-        margin: 15px 0;
-    }
-    .stImage > img {
-        border: 1px solid #e0e0e0;
-        border-radius: 5px;
-        max-width: 100%;
-        max-height: 300px;
-        object-fit: contain;
-        display: block;
-        margin: auto;
-    }
-    .image-container {
         padding: 10px;
-        background-color: #f8f9fa;
-        border-radius: 5px;
-        margin: 15px 0;
+        margin: 10px 0;
     }
     </style>
 """, unsafe_allow_html=True)
 
-# Function to read YAML file and extract units from comments
+# --- Functions ---
+
+# Parse YAML with unit comments
 def load_yaml_with_units(file_path):
     try:
-        # Read raw file to parse comments
-        with open(file_path, 'r', encoding='utf-8') as file:
-            lines = file.readlines()
-        
-        # Parse YAML for data
-        with open(file_path, 'r', encoding='utf-8') as file:
-            data = yaml.safe_load(file)
-        
-        # Extract units from comments
+        with open(file_path, 'r') as f:
+            lines = f.readlines()
+        with open(file_path, 'r') as f:
+            data = yaml.safe_load(f)
+
         units = {}
-        current_key = None
+        key_stack = []
         for line in lines:
-            line = line.rstrip()
-            # Match key-value lines with optional indentation
-            key_match = re.match(r'^\s*([\w-]+)\s*:', line)
-            if key_match:
-                current_key = key_match.group(1)
-            # Match comments with units (e.g., "# mm")
-            comment_match = re.match(r'^\s*#.*\b(\w+)\b', line)
-            if comment_match and current_key:
-                units[current_key] = comment_match.group(1)
+            if not line.strip():
+                continue
+            indent = len(line) - len(line.lstrip())
+            while key_stack and key_stack[-1][0] >= indent:
+                key_stack.pop()
+            match_key = re.match(r'^\s*([\w\-]+)\s*:', line)
+            if match_key:
+                key = match_key.group(1)
+                full_key = ".".join([k[1] for k in key_stack] + [key])
+                key_stack.append((indent, key))
+            else:
+                full_key = ".".join([k[1] for k in key_stack]) if key_stack else ""
+
+            match_comment = re.search(r'#\s*(\S+)', line)
+            if match_comment and full_key:
+                units[full_key] = match_comment.group(1)
         return data, units
     except Exception as e:
         return {"error": f"Failed to load {file_path}: {str(e)}"}, {}
 
-# Function to format YAML data into grouped, readable sections
+# Recursively format YAML data
 def format_data(data, units):
     result = []
-    def process_item(key, value, parent_key="", level=0):
+
+    def recurse(key, value, path=""):
+        full_key = f"{path}.{key}" if path else key
         display_key = key.replace("-", " ").title()
+        level = path.count(".")
         if isinstance(value, dict):
-            # Group nested items under a section
             result.append((level, f"**{display_key}**", ""))
-            for sub_key, sub_value in value.items():
-                process_item(sub_key, sub_value, f"{parent_key}.{key}" if parent_key else key, level + 1)
+            for sub_key, sub_val in value.items():
+                recurse(sub_key, sub_val, full_key)
         else:
-            # Handle scalar values and lists
-            unit = units.get(key, "[]")
-            result.append((level, display_key, f"{value} {unit}"))
-    
-    for key, value in data.items():
-        process_item(key, value)
+            unit = units.get(full_key, "")
+            result.append((level, display_key, f"{value} {unit}".strip()))
+
+    for key, val in data.items():
+        recurse(key, val)
     return result
 
-# Streamlit app
+# Display zoomable image
+def display_zoomable_image(image_path):
+    if not os.path.exists(image_path):
+        st.write(f"Image not found: {image_path}")
+        return
+    with open(image_path, "rb") as f:
+        encoded = base64.b64encode(f.read()).decode()
+    html(f"""
+        <div style="overflow:hidden; border-radius:10px; border:1px solid #ccc">
+            <img src="data:image/jpeg;base64,{encoded}" style="width:100%; transition:0.3s ease"
+                 onmouseover="this.style.transform='scale(1.05)'"
+                 onmouseout="this.style.transform='scale(1)'">
+        </div>
+    """, height=300)
+
+# --- UI App ---
+
 st.title("Material and Process Data Viewer")
 st.write("Explore LPBF of TiB2-modified Al-Mg-Si-Zr alloys.")
 
-# Debug: Print current working directory
-st.write(f"Working directory: {SCRIPT_DIR}")
-
-# Mapping of display names to YAML files and images
+# File and image mapping
 file_map = {
-    "Process": {"yaml": os.path.join(SCRIPT_DIR, "lpbf_process.yaml"), "image": os.path.join(SCRIPT_DIR, "lpbf-process.jpg")},
-    "Alloy Matrix": {"yaml": os.path.join(SCRIPT_DIR, "base_materials.yaml"), "image": os.path.join(SCRIPT_DIR, "base-alloy.jpg")},
-    "Composite Blend": {"yaml": os.path.join(SCRIPT_DIR, "composite_powder.yaml"), "image": os.path.join(SCRIPT_DIR, "composite-powder.jpg")}
+    "Process": {
+        "yaml": os.path.join(SCRIPT_DIR, "lpbf_process.yaml"),
+        "image": os.path.join(SCRIPT_DIR, "lpbf-process.jpg"),
+        "description": "Laser powder bed fusion parameters."
+    },
+    "Alloy Matrix": {
+        "yaml": os.path.join(SCRIPT_DIR, "base_materials.yaml"),
+        "image": os.path.join(SCRIPT_DIR, "base-alloy.jpg"),
+        "description": "Base aluminum alloy chemistry and properties."
+    },
+    "Composite Blend": {
+        "yaml": os.path.join(SCRIPT_DIR, "composite_powder.yaml"),
+        "image": os.path.join(SCRIPT_DIR, "composite-powder.jpg"),
+        "description": "Details of powder blends with TiB₂."
+    }
 }
 
-# Dropdown to select data
+# Dropdown
 selected_option = st.selectbox(
     "Select Data",
     list(file_map.keys()),
-    index=0,  # Default to "Process"
-    key="data_select"
+    index=0,
+    help="Choose which dataset to explore: Process, Matrix, or Composite."
 )
+st.caption(file_map[selected_option]["description"])
 
-# Load and display data
+# Load data
 file_path = file_map[selected_option]["yaml"]
 image_path = file_map[selected_option]["image"]
 data, units = load_yaml_with_units(file_path)
 
-# Debug: Print attempted file paths
-st.write(f"YAML file: {file_path}")
-st.write(f"Image file: {image_path}")
+# Layout: two columns
+col1, col2 = st.columns([3, 2])
 
-# Create two columns for inline display
-col1, col2 = st.columns([2, 1])
-
-# Display data in the first column
 with col1:
     st.subheader(selected_option)
-    formatted_data = format_data(data, units)
-    if formatted_data:
-        current_level = 0
-        section_content = []
-        for level, key, value in formatted_data:
-            if level == 0 and section_content:
-                # Display previous section
-                st.markdown(f'<div class="data-section">{"<br>".join(section_content)}</div>', unsafe_allow_html=True)
-                section_content = []
+    formatted = format_data(data, units)
+    if formatted:
+        section = []
+        for level, key, val in formatted:
+            if level == 0 and section:
+                st.markdown(f'<div class="data-section">{"<br>".join(section)}</div>', unsafe_allow_html=True)
+                section = []
             if level == 0:
-                section_content.append(f"{key}")
+                section.append(f"{key}")
             else:
-                indent = " " * (level * 2)
-                section_content.append(f"{indent}- {key}: {value}")
-        # Display last section
-        if section_content:
-            st.markdown(f'<div class="data-section">{"<br>".join(section_content)}</div>', unsafe_allow_html=True)
+                indent = level * 12
+                section.append(f'<div style="margin-left:{indent}px">- <strong>{key}</strong>: {val}</div>')
+        if section:
+            st.markdown(f'<div class="data-section">{"<br>".join(section)}</div>', unsafe_allow_html=True)
     else:
         st.write("No data available.")
 
-# Display image in the second column
 with col2:
-    st.subheader(f"{selected_option} Visualization")
-    if os.path.exists(image_path):
-        st.markdown('<div class="image-container">', unsafe_allow_html=True)
-        st.image(image_path, caption=f"{selected_option} Image", use_container_width=True)
-        st.markdown('</div>', unsafe_allow_html=True)
-    else:
-        st.write(f"Image not found: {image_path}. Please ensure the file exists in the working directory.")
+    display_zoomable_image(image_path)
