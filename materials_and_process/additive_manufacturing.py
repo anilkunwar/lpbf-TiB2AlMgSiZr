@@ -135,6 +135,6 @@ with col1:
 # Display image in the second column
 with col2:
     if os.path.exists(image_path):
-        st.image(image_path, caption=f"{selected_option} Visualization", use_column_width=True)
+        st.image(image_path, caption=f"{selected_option} Visualization", use_container_width=True)
     else:
         st.write(f"Image not found: {image_path}")
