@@ -3,6 +3,10 @@ import yaml
 import re
 import os
 
+
+# Get the directory of the current script
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__)) 
+
 # Minimal CSS for clean, pleasing appearance
 st.markdown("""
     <style>
@@ -84,9 +88,9 @@ st.write("Explore LPBF of TiB2-modified Al-Mg-Si-Zr alloys.")
 
 # Mapping of display names to YAML files and images
 file_map = {
-    "Process": {"yaml": "lpbf_process.yaml", "image": "lpbf-process.jpg"},
-    "Alloy Matrix": {"yaml": "base_materials.yaml", "image": "alloy_matrix.jpg"},
-    "Composite Blend": {"yaml": "composite_powder.yaml", "image": "composite-powder.jpg"}
+    "Process": {"yaml": os.path.join(SCRIPT_DIR, "lpbf_process.yaml"), "image":os.path.join(SCRIPT_DIR, "images", "lpbf-process.jpg")},
+    "Alloy Matrix": {"yaml": os.path.join(SCRIPT_DIR, "base_materials.yaml"), "image": os.path.join(SCRIPT_DIR, "alloy_matrix.jpg")},
+    "Composite Blend": {"yaml": os.path.join(SCRIPT_DIR, "composite_powder.yaml"), "image": os.path.join(SCRIPT_DIR, "composite-powder.jpg")}
 }
 
 # Dropdown to select data
