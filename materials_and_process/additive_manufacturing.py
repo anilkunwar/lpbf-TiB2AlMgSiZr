@@ -3,7 +3,7 @@ import yaml
 import re
 import os
 
-# Light CSS for clean, pleasing appearance
+# Minimal CSS for clean, pleasing appearance
 st.markdown("""
     <style>
     .main {
@@ -69,12 +69,8 @@ def format_data(data, units):
             result.append((level, f"**{display_key}**", ""))
             for sub_key, sub_value in value.items():
                 process_item(sub_key, sub_value, f"{parent_key}.{key}" if parent_key else key, level + 1)
-        elif isinstance(value, list):
-            # Handle lists (e.g., laser_power)
-            unit = units.get(key, "[]")
-            result.append((level, display_key, f"{value} {unit}"))
         else:
-            # Handle scalar values
+            # Handle scalar values and lists
             unit = units.get(key, "[]")
             result.append((level, display_key, f"{value} {unit}"))
     
@@ -89,7 +85,7 @@ st.write("Explore LPBF of TiB2-modified Al-Mg-Si-Zr alloys.")
 # Mapping of display names to YAML files and images
 file_map = {
     "Process": {"yaml": "lpbf_process.yaml", "image": "lpbf-process.jpg"},
-    "Alloy Matrix": {"yaml": "base_materials.yaml", "image": "base-alloy.jpg"},
+    "Alloy Matrix": {"yaml": "base_materials.yaml", "image": "alloy_matrix.jpg"},
     "Composite Blend": {"yaml": "composite_powder.yaml", "image": "composite-powder.jpg"}
 }
 
@@ -124,7 +120,7 @@ with col1:
             if level == 0:
                 section_content.append(f"{key}")
             else:
-                indent = "&nbsp;" * (level * 4)
+                indent = " " * (level * 4)
                 section_content.append(f"{indent}- {key}: {value}")
         # Display last section
         if section_content:
