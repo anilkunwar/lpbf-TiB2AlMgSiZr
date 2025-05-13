@@ -1,0 +1,17 @@
+lpbf_process:
+  machine: "EP M260"
+  manufacturer: "E-Plus-3D"
+  materials: "TiB2/Al–Si–Mg–Zr"
+  specimen_dimensions:
+    length: 55  # mm
+    width: 15   # mm
+    height: 15  # mm
+  process_parameters:
+    laser_power: [250, 350]  # W
+    laser_beam_diameter: 100  # μm
+    powder_layer_thickness: 30  # μm
+    hatch_spacing: 100  # μm
+    laser_scanning_speed: [800, 900, 1000, 1100, 1200]  # mm/s
+    angle_of_rotation: 67  # °
+  
+

@@ -1,0 +1,29 @@
+base_materials:
+  Base-Alloy:
+    name: "Al–Si–Mg–Zr"
+    type: "Alloy"
+    chemical_composition:
+      Al: 90.55  # wt%
+      Si: 7.43   # wt%
+      Mg: 1.57   # wt%
+      Zr: 0.37   # wt%
+      Fe: 0.08   # wt%
+    powder_size_range:
+      min: 15    # μm
+      max: 53    # μm
+    average_size: 36.9  # μm
+    production_method:
+      process: "Vacuum Induction N2 Gas Atomization"
+      raw_materials:
+        Al: 99.99   # wt%
+        Mg: 99.9    # wt%
+        Si: 99.99   # wt%
+        Al-5Zr: 99.5  # wt%
+
+  TiB2-particle:
+    name: "TiB2"
+    type: "Ceramic"
+    particle_size_range:
+      min: 50  # nm
+      max: 500  # nm
+

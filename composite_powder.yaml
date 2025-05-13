@@ -1,0 +1,13 @@
+composite_powder:
+  name: "TiB2/Al–Si–Mg–Zr"
+  composition:
+    Al-Si-Mg-Zr: 98.0  # wt%
+    TiB2: 2.0  # wt%
+  preparation:
+    method: "Mechanical Mixing"
+    rotation_speed: 200  # rpm
+    duration: 12  # h
+  morphology:
+    shape: "Nearly spherical"
+    TiB2_distribution: "Attached to Al–Si–Mg–Zr surface, some agglomeration"
+
