@@ -3,9 +3,8 @@ import yaml
 import re
 import os
 
-
 # Get the directory of the current script
-SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__)) 
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 
 # Minimal CSS for clean, pleasing appearance
 st.markdown("""
@@ -18,18 +17,29 @@ st.markdown("""
         border-radius: 5px;
         padding: 8px;
         font-size: 16px;
+        background-color: #ffffff;
     }
     .data-section {
         background-color: #f8f9fa;
         border: 1px solid #e0e0e0;
         border-radius: 5px;
-        padding: 10px;
-        margin: 10px 0;
+        padding: 15px;
+        margin: 15px 0;
     }
     .stImage > img {
         border: 1px solid #e0e0e0;
         border-radius: 5px;
         max-width: 100%;
+        max-height: 300px;
+        object-fit: contain;
+        display: block;
+        margin: auto;
+    }
+    .image-container {
+        padding: 10px;
+        background-color: #f8f9fa;
+        border-radius: 5px;
+        margin: 15px 0;
     }
     </style>
 """, unsafe_allow_html=True)
@@ -38,27 +48,26 @@ st.markdown("""
 def load_yaml_with_units(file_path):
     try:
         # Read raw file to parse comments
-        with open(file_path, 'r') as file:
+        with open(file_path, 'r', encoding='utf-8') as file:
             lines = file.readlines()
         
         # Parse YAML for data
-        with open(file_path, 'r') as file:
+        with open(file_path, 'r', encoding='utf-8') as file:
             data = yaml.safe_load(file)
         
         # Extract units from comments
         units = {}
         current_key = None
         for line in lines:
-            line = line.strip()
-            # Match key-value lines
-            if ':' in line and not line.startswith('#'):
-                key = line.split(':')[0].strip()
-                current_key = key
+            line = line.rstrip()
+            # Match key-value lines with optional indentation
+            key_match = re.match(r'^\s*([\w-]+)\s*:', line)
+            if key_match:
+                current_key = key_match.group(1)
             # Match comments with units (e.g., "# mm")
-            if line.startswith('#') and current_key:
-                match = re.search(r'#\s*(\S+)', line)
-                if match:
-                    units[current_key] = match.group(1)
+            comment_match = re.match(r'^\s*#.*\b(\w+)\b', line)
+            if comment_match and current_key:
+                units[current_key] = comment_match.group(1)
         return data, units
     except Exception as e:
         return {"error": f"Failed to load {file_path}: {str(e)}"}, {}
@@ -86,6 +95,9 @@ def format_data(data, units):
 st.title("Material and Process Data Viewer")
 st.write("Explore LPBF of TiB2-modified Al-Mg-Si-Zr alloys.")
 
+# Debug: Print current working directory
+st.write(f"Working directory: {SCRIPT_DIR}")
+
 # Mapping of display names to YAML files and images
 file_map = {
     "Process": {"yaml": os.path.join(SCRIPT_DIR, "lpbf_process.yaml"), "image": os.path.join(SCRIPT_DIR, "lpbf-process.jpg")},
@@ -106,8 +118,12 @@ file_path = file_map[selected_option]["yaml"]
 image_path = file_map[selected_option]["image"]
 data, units = load_yaml_with_units(file_path)
 
+# Debug: Print attempted file paths
+st.write(f"YAML file: {file_path}")
+st.write(f"Image file: {image_path}")
+
 # Create two columns for inline display
-col1, col2 = st.columns([3, 2])
+col1, col2 = st.columns([2, 1])
 
 # Display data in the first column
 with col1:
@@ -124,7 +140,7 @@ with col1:
             if level == 0:
                 section_content.append(f"{key}")
             else:
-                indent = " " * (level * 4)
+                indent = " " * (level * 2)
                 section_content.append(f"{indent}- {key}: {value}")
         # Display last section
         if section_content:
@@ -134,7 +150,10 @@ with col1:
 
 # Display image in the second column
 with col2:
+    st.subheader(f"{selected_option} Visualization")
     if os.path.exists(image_path):
-        st.image(image_path, caption=f"{selected_option} Visualization", use_container_width=True)
+        st.markdown('<div class="image-container">', unsafe_allow_html=True)
+        st.image(image_path, caption=f"{selected_option} Image", use_container_width=True)
+        st.markdown('</div>', unsafe_allow_html=True)
     else:
-        st.write(f"Image not found: {image_path}")
+        st.write(f"Image not found: {image_path}. Please ensure the file exists in the working directory.")
