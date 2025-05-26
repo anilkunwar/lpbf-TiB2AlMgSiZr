@@ -8,7 +8,12 @@ import streamlit.components.v1 as components
 st.title("Mechanical Properties Table Viewer")
 
 # Path to the JSON file (assumed to be in the same directory as the script)
-json_file_path = "mechanical_properties_of_samples.json"
+#json_file_path = "mechanical_properties_of_samples.json"
+# Get the directory where this script is located
+BASE_DIR = os.path.dirname(__file__)
+
+# JSON file path relative to the script folder
+json_file_path = os.path.join(BASE_DIR, "mechanical_properties_of_samples.json")
 
 # Check if the JSON file exists
 if os.path.exists(json_file_path):
