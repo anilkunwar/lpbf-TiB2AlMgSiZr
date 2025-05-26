@@ -1,4 +1,4 @@
-import streamlit as st
+aimport streamlit as st
 import pandas as pd
 import json
 import os
@@ -143,4 +143,4 @@ if os.path.exists(json_file_path):
     components.html(chart_html, height=400)
 
 else:
-    st.error(f"JSON file not found at {json_file_path}. Please ensure 'data.json' is in the same directory as the script.")
+    st.error(f"JSON file not found at {json_file_path}. Please ensure 'mechanical_properties_of_samples.json' is in the same directory as the script.")
