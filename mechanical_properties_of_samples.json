@@ -1,0 +1,59 @@
+[
+  {
+    "Sample": "TiB2/Al–Si–Mg–Zr",
+    "Condition": "As-built",
+    "YS": { "value": 408, "error": 9 },
+    "UTS": { "value": 514, "error": 8 },
+    "Elongation": { "value": 4.7, "error": 1.2 }
+  },
+  {
+    "Sample": "TiB2/Al–Si–Mg–Zr",
+    "Condition": "150 °C–12 h",
+    "YS": { "value": 406, "error": 10 },
+    "UTS": { "value": 518, "error": 6 },
+    "Elongation": { "value": 4.8, "error": 1.1 }
+  },
+  {
+    "Sample": "TiB2/Al–Si–Mg–Zr",
+    "Condition": "150 °C–24 h",
+    "YS": { "value": 403, "error": 11 },
+    "UTS": { "value": 520, "error": 12 },
+    "Elongation": { "value": 4.7, "error": 1.1 }
+  },
+  {
+    "Sample": "TiB2/Al–Si–Mg–Zr",
+    "Condition": "150 °C–48 h",
+    "YS": { "value": 419, "error": 3 },
+    "UTS": { "value": 517, "error": 10 },
+    "Elongation": { "value": 4.4, "error": 1.2 }
+  },
+  {
+    "Sample": "TiB2/Al–Si–Mg–Zr",
+    "Condition": "250 °C–2 h",
+    "YS": { "value": 221, "error": 10 },
+    "UTS": { "value": 345, "error": 7 },
+    "Elongation": { "value": 8.3, "error": 0.7 }
+  },
+  {
+    "Sample": "TiB2/Al–Si–Mg–Zr",
+    "Condition": "300 °C–2 h",
+    "YS": { "value": 182, "error": 1 },
+    "UTS": { "value": 279, "error": 1 },
+    "Elongation": { "value": 13.5, "error": 4 }
+  },
+  {
+    "Sample": "Al–Si–Mg–Zr",
+    "Condition": "As-built",
+    "YS": { "value": 343, "error": 3 },
+    "UTS": { "value": 485, "error": 4 },
+    "Elongation": { "value": 10.2, "error": 0.2 }
+  },
+  {
+    "Sample": "Al–Si–Mg–Zr",
+    "Condition": "300 °C–2 h",
+    "YS": { "value": 198, "error": 1 },
+    "UTS": { "value": 305, "error": 6 },
+    "Elongation": { "value": 28.3, "error": 3.3 }
+  }
+]
+
